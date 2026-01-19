@@ -5,3 +5,7 @@ libs = ["lib"]
 optimizer = true
 optimizer_runs = 200
 solc_version = "0.8.20"
+
+remappings = [
+    "@openzeppelin/=lib/openzeppelin-contracts/contracts/"
+]

@@ -1,4 +1,5 @@
 # Stablecoin AMM Demo (Sepolia)
+<img src="./dUSD-t.png" alt="dUSD coin" width="200"/>
 
 This project demonstrates a **testnet-only stablecoin mechanism** using:
 
@@ -31,3 +32,4 @@ It does **not** represent a production-ready stablecoin.
 
 ```bash
 forge script script/Deploy.s.sol --rpc-url $SEPOLIA_RPC --broadcast
+```
