@@ -1,5 +1,5 @@
 # Stablecoin AMM Demo (Sepolia)
-<img src="./dUSD-t.png" alt="dUSD coin" width="200"/>
+<img src="./dUSD-t.png" alt="dUSD coin" width="200"/><img src="./mWETH-t.png" alt="dUSD coin" width="200"/>
 
 This project demonstrates a **testnet-only stablecoin mechanism** using:
 
