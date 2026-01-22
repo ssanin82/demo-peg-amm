@@ -4,14 +4,14 @@ pragma solidity ^0.8.20;
 import "@openzeppelin/token/ERC20/ERC20.sol";
 import "@openzeppelin/access/Ownable.sol";
 
-contract DemoStablecoin is ERC20, Ownable {
+contract DemoStablecoinUSC is ERC20, Ownable {
     address public amm;
     address public minterRedeemer;
 
     event Mint(address indexed to, uint256 amount);
     event Burn(address indexed from, uint256 amount);
 
-    constructor() ERC20("Demo USD", "dUSD") Ownable(msg.sender) {}
+    constructor() ERC20("Demo USC", "dUSC") Ownable(msg.sender) {}
 
     function setAMM(address _amm) external onlyOwner {
         amm = _amm;

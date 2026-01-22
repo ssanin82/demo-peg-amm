@@ -1,0 +1,69 @@
+I want to create a simulation of a blockchain ecosystem.
+The primary goal is to demonstrate the creation and maintenance of a stable coin.
+It will run multiple components, but it should have a kill switch that turns off all components.
+It will have smart contracts, as well as components running in Python.
+
+I created a skeleton project in Foundry for it. Please, feel free to add new contracts and/or modify existing ones.
+
+The ecosystem must have the following contracts:
+- 2 stable coins:
+  - (contract 1) DemoStablecoin.sol (exists, can modify) - dUSD
+  - (contract 2) Another stable coin, dUSC
+- (contract 3) One mock mWETH token (example in contract MockWETH.sol)
+- (contract 4) One simple DEX exchange with two constant product AMM pools (SimpleAMMWithPeg.sol for reference):
+   dUSD/mWETH pool - remove minting abilities
+   dUSC/mWETH pool - remove minting abilities
+- (contract 5) One externally triggered price oracle
+- (contract 6) One simple lending protocol - similar to AAVE, but simplified
+  - It should accept mWETH as collateral
+  - Can borrow dUSD and dUSC
+  - It should have 100000 dUSD and 100000 dUSC minted on start.
+  - It should be 150% overcollateralized
+  - Must have a liquidation function, similar to AAVE. The liquidation function uses the oracle price every time.
+  - If collateral to borrow amount hits 120%, that is the liquidation threshold
+  - It should use the oracle to determine collateralization ratios and the liquidation threshold
+  - It can't lend more dUSD and dUSC than it has in its reserves
+  - Add liquidation bonuses in lending protocol (5%)
+  - It will be able to mint, burn, and transfer all the tokens initially: dUSD, dUSC, mWETH. The initial mint and transfer are described below.
+  - When the debt is repaid, and collateral is returned, it will burn the returned dUSD and dUSC
+- (contract 7) MinterRedeemer
+  - it be able to mint dUSD at $1 oracle price by depositing $1 worth of mWETH
+  - it would be able to redeem dUSD for $1 worth of mWETH
+  - it would be able to mint dUSC at $1 oracle price by depositing $1 worth of mWETH
+  - it be able to redeem dUSC for $1 worth of mWETH
+
+At the start, the lending protocol will:
+  - It will initially mint the following token balances to the following contracts:
+    - contract 4 (the AMM DEX) will receive 4000 dUSD, 4000 dUSC, 4 mWETH, it will deposit 6000 dUSD and 2 mWETH into dUSD/mWETH pool, it will deposit 6000 dUSC and 2 mWETH into dUSC/mWETH pool - dUSD, dUSC, mWETH will be minted by minter/redeemer contract
+    - contract 5 - the oracle receives nothing
+    - Contract 6 (the lender protocol) will receive 10000 dUSD and 10000 dUSC to its reserves initially - dUSD, dUSC will be minted by the minter/redeemer contract
+
+It will have a number of bots in Python. Please, create a subfolder "bots" in the root of this project, and generate "requirements.txt" if additional packages are needed. The following bots are to be created in separate files in Python. They will run off-chain, making calls to the chain.
+- Oracle bot that will read the price from Binance spot market - ETHUSDT and update mWETH price in the oracle contract (contract 5) every 5 seconds. Make sure the oracle submits the price at least once before starting the rest of the bots.
+- Retailer bot 1 (will have wallet 1 on chain) - will be buying/selling mWETH in small random amounts between 0.01 and 0.3 mWETH per transaction in dUSD/mWETH pool. It can't sell more mWETH than it has; it can't spend more stable coin than it has. If it can't buy at the moment, it must sell. If the sell quantity is too large, decrease it. The bot strives to maximize its profit. Profit = number of dUSD + number of dUSC + number of mWETH * oracle price.
+- Retailer bot 2 (will have wallet 2 on chain) - it will be the same instance as bot 1, but it will work with dUSC/mWETH pool instead.
+- Profit bot 1 (will have wallet 3 on chain) - will monitor AMM prices dUSD/mWETH and dUSC/mWETH, detect arbitrage opportunities, and take them. It will only have mWETH on start, so it will have to borrow dUSD or dUSC if needed. Will poll "liquidate" function for "profit bot's 2" wallet in the lending protocol. If liquidation is possible, it will buy bot's 2 collateral mWETH in the lending protocol for a discount, repay the profit bot's 2 debt, but only until profit bot's 2 collateralization ratio is restored, not its whole collateral.
+- Profit bot 2 (will have wallet 4 on chain) - same as profit bot 1, but will try liquidating the collateral of bot 1.
+
+Make sure borrowing logic is correctly implemented in arbitrager bots (they only borrow if it’s profitable).
+
+Minter/redeemer will mint the following amounts of coins on start and transfer them to wallets:
+- Wallet 1 will receive 2000 dUSD
+- Wallet 2 will receive 2000 dUSC
+- Wallet 3 will receive 1 mWETH
+- Wallet 4 will receive 1 mWETH
+
+Statistics gathered in one log file in chronological order (in sequence of transactions):
+- all lendings recorded
+- all AMM transactions recorded
+- all dUSD, dUSC, and mWETH mint and burn operations recorded
+
+
+Create a script to run the entire ecosystem.
+Create a script to stop the entire ecosystem at once.
+
+The project must have a valid deploy script in the "script" folder.
+The project must have tests with good test coverage in "test".
+
+Also, log every step the bots take.
+Consider adding wallet balances after each step for monitoring peg behavior.
